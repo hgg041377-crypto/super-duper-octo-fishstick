@@ -1,0 +1,11 @@
+{
+  "shopName": "فروشگاه من",
+  "shopPhone": "",
+  "shopAddress": "",
+  "adminPassword": "1234",
+  "lowStockThreshold": 3,
+  "autoBackupHours": 6,
+  "footerNote": "متشکریم از خرید شما 🌹",
+  "currency": "تومان",
+  "theme": "light"
+}

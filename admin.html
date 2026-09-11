@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6366f1">
+<title>پنل مدیر | انباریار</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/vazirmatn@5.0.0/index.min.css">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="/style-admin.css">
+<link rel="stylesheet" href="/style-invoice.css">
+</head>
+<body>
+
+<!-- صفحه ورود -->
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <div class="login-icon">🔐</div>
+    <h1>انباریار</h1>
+    <p>ورود به پنل مدیریت</p>
+    <input type="password" id="login-pass" placeholder="••••" autocomplete="current-password">
+    <button id="login-btn">ورود</button>
+    <div class="login-hint">رمز پیش‌فرض: 1234</div>
+    <div class="login-sig">✨ ساخته شده با ❤️ توسط آرین</div>
+  </div>
+</div>
+
+<!-- پنل اصلی -->
+<div id="main-panel" style="display:none">
+  <header class="header">
+    <div class="header-content">
+      <div class="header-top">
+        <div class="header-title">
+          <div class="logo">📦</div>
+          <span id="shop-name-display">انباریار</span>
+        </div>
+        <div class="header-actions">
+          <a href="/worker.html" class="icon-btn" title="صندوق">🛒</a>
+          <button class="icon-btn" id="theme-toggle" title="حالت شب">🌙</button>
+          <button class="icon-btn" id="btn-help" title="راهنما">📖</button>
+          <button class="icon-btn" id="btn-logout" title="خروج">🚪</button>
+        </div>
+      </div>
+      <div class="header-greeting" id="header-greeting">سلام</div>
+      <div class="header-title-main" id="header-title">داشبورد</div>
+      <div class="header-sub" id="header-date"></div>
+    </div>
+  </header>
+  
+  <nav class="tabs">
+    <button class="tab active" data-tab="dashboard">📊 داشبورد</button>
+    <button class="tab" data-tab="products">📦 محصولات</button>
+    <button class="tab" data-tab="add">➕ افزودن</button>
+    <button class="tab" data-tab="invoices">🧾 فاکتورها</button>
+    <button class="tab" data-tab="reports">📈 گزارش‌ها</button>
+    <button class="tab" data-tab="workers">👥 کارگرا</button>
+    <button class="tab" data-tab="settings">⚙️ تنظیمات</button>
+  </nav>
+  
+  <main class="container">
+    
+    <section class="panel active" id="panel-dashboard">
+      <div class="stats-grid" id="dashboard-stats"></div>
+      <div class="card">
+        <div class="card-title">📈 نمودار فروش ۳۰ روز اخیر</div>
+        <div class="chart-wrap"><canvas id="chart-sales"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">👥 فروش هر کارگر</div>
+        <div class="chart-wrap"><canvas id="chart-workers"></canvas></div>
+        <div id="workers-stats-list" class="workers-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <span>⚠️ کالاهای کم موجود</span>
+          <span class="badge badge-danger" id="low-stock-badge">0</span>
+        </div>
+        <div id="low-stock-list"></div>
+      </div>
+    </section>
+    
+    <section class="panel" id="panel-products">
+      <div class="card">
+        <div class="card-title">
+          <span>📦 لیست محصولات</span>
+          <span class="badge badge-purple" id="products-count">0</span>
+        </div>
+        <div class="search-box">
+          <input type="text" id="search-products" placeholder="جستجو بر اساس نام یا بارکد...">
+        </div>
+        <div class="filter-row">
+          <button class="filter-chip active" data-filter="all">همه</button>
+          <button class="filter-chip" data-filter="low">⚠️ کم موجود</button>
+          <button class="filter-chip" data-filter="out">❌ ناموجود</button>
+          <button class="filter-chip" data-filter="new">🆕 جدید</button>
+        </div>
+        <div id="products-list" class="products-grid"></div>
+      </div>
+    </section>
+    
+    <section class="panel" id="panel-add">
+      <div class="card">
+        <div class="card-title">📷 اسکن بارکد</div>
+        <div id="scanner-container" class="scanner-box">
+          <div class="scanner-placeholder">دوربین خاموش است</div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" id="btn-start-scan">📷 روشن کردن</button>
+          <button class="btn btn-secondary" id="btn-stop-scan" style="display:none">⏹ خاموش</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">➕ اطلاعات کالای جدید</div>
+        <div class="form-group">
+          <label>بارکد کالا *</label>
+          <input type="text" id="add-barcode" class="ltr" placeholder="بارکد را اسکن یا دستی وارد کنید">
+        </div>
+        <div class="form-group">
+          <label>نام کالا *</label>
+          <input type="text" id="add-name" placeholder="مثلاً: شیر پرچرب میهن">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>دسته‌بندی</label>
+            <select id="add-category"></select>
+          </div>
+          <div class="form-group">
+            <label>برند</label>
+            <select id="add-brand"></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>قیمت خرید (تومان)</label>
+            <input type="number" id="add-buy" class="ltr" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>قیمت فروش (تومان) *</label>
+            <input type="number" id="add-sell" class="ltr" placeholder="0">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>موجودی اولیه</label>
+            <input type="number" id="add-qty" class="ltr" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>حداقل موجودی</label>
+            <input type="number" id="add-min" class="ltr" value="3">
+          </div>
+        </div>
+        <button class="btn btn-success btn-block" id="btn-add-product">✅ ثبت کالا</button>
+      </div>
+    </section>
+    
+    <section class="panel" id="panel-invoices">
+      <div class="stats-grid compact" id="invoice-stats"></div>
+      <div class="card">
+        <div class="card-title">
+          <span>🧾 فاکتورهای بسته شده</span>
+          <span class="badge badge-info" id="invoices-count">0</span>
+        </div>
+        <div class="search-box">
+          <input type="text" id="search-invoices" placeholder="جستجو (شماره، مشتری، کارگر، تلفن)...">
+        </div>
+        <div id="invoices-list"></div>
+      </div>
+    </section>
+    
+    <section class="panel" id="panel-reports">
+      <div class="card">
+        <div class="card-title">📥 خروجی اطلاعات</div>
+        <div class="btn-group">
+          <button class="btn btn-success btn-sm" id="export-invoices-csv">📊 اکسل فاکتورها</button>
+          <button class="btn btn-success btn-sm" id="export-products-csv">📦 اکسل کالاها</button>
+          <button class="btn btn-info btn-sm" id="export-json">💾 بکاپ JSON</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📈 گزارش فروش تفصیلی</div>
+        <div class="form-row">
+          <select id="report-period">
+            <option value="7">۷ روز اخیر</option>
+            <option value="30" selected>۳۰ روز اخیر</option>
+            <option value="90">۹۰ روز اخیر</option>
+            <option value="365">یک سال اخیر</option>
+          </select>
+          <select id="report-worker"><option value="">همه کارگرا</option></select>
+        </div>
+        <div id="detailed-report"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 فروش هر کارگر (نمودار دایره‌ای)</div>
+        <div class="chart-wrap"><canvas id="chart-workers-pie"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🏆 پرفروش‌ترین کالاها</div>
+        <div id="top-products"></div>
+      </div>
+    </section>
+    
+    <section class="panel" id="panel-workers">
+      <div class="card">
+        <div class="card-title">
+          <span>👥 لیست کارگرا</span>
+          <span class="badge badge-purple" id="workers-count">0</span>
+        </div>
+        <div id="workers-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">➕ افزودن کارگر جدید</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>نام</label>
+            <input type="text" id="new-worker-name" placeholder="مثلاً: علی">
+          </div>
+          <div class="form-group">
+            <label>نقش</label>
+            <select id="new-worker-role">
+              <option value="worker">کارگر</option>
+              <option value="manager">مدیر</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" id="btn-add-worker">➕ افزودن</button>
+      </div>
+      <div class="card">
+        <div class="card-title">📱 QR کد صندوق کارگرا</div>
+        <p style="font-size:12px;color:var(--text-3);margin-bottom:12px">کارگرا با اسکن این QR، مستقیم وارد صندوق می‌شن</p>
+        <div class="qr-box">
+          <div id="qr-container"></div>
+          <div class="qr-url" id="qr-url"></div>
+          <button class="btn btn-secondary btn-sm" id="btn-copy-qr">📋 کپی آدرس</button>
+        </div>
+      </div>
+    </section>
+    
+    <section class="panel" id="panel-settings">
+      <div class="card">
+        <div class="card-title">🏪 اطلاعات فروشگاه</div>
+        <div class="form-group">
+          <label>نام فروشگاه</label>
+          <input type="text" id="set-shop-name">
+        </div>
+        <div class="form-group">
+          <label>تلفن فروشگاه</label>
+          <input type="text" id="set-shop-phone" class="ltr">
+        </div>
+        <div class="form-group">
+          <label>آدرس</label>
+          <input type="text" id="set-shop-address">
+        </div>
+        <div class="form-group">
+          <label>متن پایین فاکتور</label>
+          <input type="text" id="set-footer-note">
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔐 امنیت</div>
+        <div class="form-group">
+          <label>رمز عبور مدیر</label>
+          <input type="password" id="set-admin-pass" class="ltr" placeholder="حداقل ۴ کاراکتر">
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚙️ تنظیمات پیشرفته</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>حد هشدار موجودی</label>
+            <input type="number" id="set-low-stock" class="ltr">
+          </div>
+          <div class="form-group">
+            <label>فاصله بکاپ (ساعت)</label>
+            <input type="number" id="set-backup-hours" class="ltr">
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-success btn-block" id="btn-save-settings">💾 ذخیره تنظیمات</button>
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">📂 مدیریت دسته‌بندی و برند</div>
+        <div class="btn-group">
+          <button class="btn btn-secondary btn-sm" id="btn-manage-categories">🗂️ دسته‌بندی‌ها</button>
+          <button class="btn btn-secondary btn-sm" id="btn-manage-brands">🏷️ برندها</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">💾 پشتیبان‌گیری</div>
+        <button class="btn btn-info btn-block" id="btn-manual-backup">💾 گرفتن بکاپ الان</button>
+      </div>
+      <div class="card" style="text-align:center;padding:24px">
+        <div style="font-size:44px;margin-bottom:8px">📦</div>
+        <div style="font-size:18px;font-weight:800;margin-bottom:4px">انباریار</div>
+        <div style="font-size:12px;color:var(--text-3)">نسخه 3.0</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:8px">✨ ساخته شده با ❤️ توسط آرین</div>
+      </div>
+    </section>
+    
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+// ============================================================
+//  admin.html - پنل مدیر انباریار
+//  ساخته شده با ❤️ توسط آرین
+// ============================================================
+
+const $ = (s, p = document) => p.querySelector(s);
+const $$ = (s, p = document) => [...p.querySelectorAll(s)];
+
+let state = {
+  adminPass: localStorage.getItem('anbariyar_admin_pass') || '',
+  products: [],
+  categories: [],
+  brands: [],
+  users: [],
+  invoices: [],
+  settings: {},
+  scanner: null,
+  isScanning: false,
+  currentFilter: 'all',
+  viewedInvoice: null,
+  charts: { sales: null, workers: null, pie: null, detailed: null }
+};
+
+const fmt = n => (Number(n) || 0).toLocaleString('fa-IR');
+const fmtDate = d => { try { return new Date(d).toLocaleDateString('fa-IR'); } catch { return d; } };
+const fmtDateTime = d => { try { const dt = new Date(d); return dt.toLocaleDateString('fa-IR') + ' ' + dt.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }); } catch { return d; } };
+
+function toast(msg, type = '') {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', 'X-Admin-Pass': state.adminPass };
+}
+
+async function api(path, options = {}) {
+  const res = await fetch(path, {
+    headers: authHeaders(),
+    ...options,
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+  return res.json();
+}
+
+// ============================================================
+//  احراز هویت
+// ============================================================
+async function doLogin() {
+  const pass = $('#login-pass').value.trim();
+  if (!pass) return;
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pass })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      state.adminPass = pass;
+      localStorage.setItem('anbariyar_admin_pass', pass);
+      showPanel();
+    } else {
+      toast('رمز اشتباه است', 'error');
+      $('#login-pass').value = '';
+    }
+  } catch (e) {
+    toast('خطا در ارتباط با سرور', 'error');
+  }
+}
+
+function logout() {
+  if (!confirm('از پنل خارج می‌شوید؟')) return;
+  localStorage.removeItem('anbariyar_admin_pass');
+  location.reload();
+}
+
+function showPanel() {
+  $('#login-screen').style.display = 'none';
+  $('#main-panel').style.display = 'block';
+  initPanel();
+}
+
+// ============================================================
+//  شروع پنل
+// ============================================================
+async function initPanel() {
+  updateHeaderDate();
+  await loadConfig();
+  await loadSettings();
+  await loadProducts();
+  await loadUsers();
+  await loadInvoices();
+  renderCategoryOptions();
+  renderBrandOptions();
+  renderWorkersReportFilter();
+  await loadDashboard();
+  generateQR();
+  bindTabs();
+  bindGlobalActions();
+}
+
+function updateHeaderDate() {
+  const now = new Date();
+  $('#header-date').textContent = now.toLocaleDateString('fa-IR', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+  const h = now.getHours();
+  let greet = 'سلام';
+  if (h < 12) greet = 'صبح بخیر';
+  else if (h < 17) greet = 'ظهر بخیر';
+  else if (h < 20) greet = 'عصر بخیر';
+  else greet = 'شب بخیر';
+  $('#header-greeting').textContent = greet;
+}
+
+function bindTabs() {
+  $$('.tab').forEach(tab => {
+    tab.onclick = () => {
+      $$('.tab').forEach(t => t.classList.remove('active'));
+      $$('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      const name = tab.dataset.tab;
+      $('#panel-' + name).classList.add('active');
+      $('#header-title').textContent = tab.textContent.replace(/^[^\s]+\s/, '').trim();
+      if (name !== 'add') stopScanner();
+      if (name === 'dashboard') loadDashboard();
+      if (name === 'invoices') loadInvoices();
+      if (name === 'reports') { renderWorkersReportFilter(); loadDetailedReport(); loadPieChart(); }
+      if (name === 'workers') generateQR();
+      if (name === 'settings') loadSettings();
+      window.scrollTo(0, 0);
+    };
+  });
+}
+
+function bindGlobalActions() {
+  $('#btn-help')?.addEventListener('click', showHelp);
+  $('#btn-logout')?.addEventListener('click', logout);
+  $('#theme-toggle')?.addEventListener('click', toggleTheme);
+  $('#search-products')?.addEventListener('input', renderProducts);
+  $$('.filter-chip').forEach(chip => {
+    chip.onclick = () => {
+      $$('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      state.currentFilter = chip.dataset.filter;
+      renderProducts();
+    };
+  });
+  $('#btn-start-scan')?.addEventListener('click', startScanner);
+  $('#btn-stop-scan')?.addEventListener('click', stopScanner);
+  $('#btn-add-product')?.addEventListener('click', addProduct);
+  $('#search-invoices')?.addEventListener('input', renderInvoices);
+  $('#report-period')?.addEventListener('change', loadDetailedReport);
+  $('#report-worker')?.addEventListener('change', loadDetailedReport);
+  $('#export-invoices-csv')?.addEventListener('click', exportInvoicesCSV);
+  $('#export-products-csv')?.addEventListener('click', exportProductsCSV);
+  $('#export-json')?.addEventListener('click', exportJSON);
+  $('#btn-add-worker')?.addEventListener('click', addWorker);
+  $('#btn-copy-qr')?.addEventListener('click', copyQRUrl);
+  $('#btn-save-settings')?.addEventListener('click', saveSettings);
+  $('#btn-manual-backup')?.addEventListener('click', manualBackup);
+  $('#btn-manage-categories')?.addEventListener('click', manageCategories);
+  $('#btn-manage-brands')?.addEventListener('click', manageBrands);
+}
+
+// ============================================================
+//  بارگذاری داده‌ها
+// ============================================================
+async function loadConfig() {
+  const data = await api('/api/config');
+  if (!data.ok) return;
+  state.categories = data.categories || [];
+  state.brands = data.brands || [];
+}
+
+async function loadSettings() {
+  const data = await api('/api/settings');
+  if (!data.ok) return;
+  state.settings = data.settings;
+  $('#set-shop-name').value = data.settings.shopName || '';
+  $('#set-shop-phone').value = data.settings.shopPhone || '';
+  $('#set-shop-address').value = data.settings.shopAddress || '';
+  $('#set-footer-note').value = data.settings.footerNote || '';
+  $('#set-low-stock').value = data.settings.lowStockThreshold || 3;
+  $('#set-backup-hours').value = data.settings.autoBackupHours || 6;
+  $('#shop-name-display').textContent = data.settings.shopName || 'انباریار';
+}
+
+async function loadProducts() {
+  const data = await api('/api/products');
+  if (!data.ok) return;
+  state.products = data.products || [];
+  $('#products-count').textContent = state.products.length;
+  renderProducts();
+}
+
+async function loadUsers() {
+  const data = await api('/api/users');
+  if (!data.ok) return;
+  state.users = data.users || [];
+  $('#workers-count').textContent = state.users.length;
+  renderWorkers();
+}
+
+async function loadInvoices() {
+  const data = await api('/api/invoices');
+  if (!data.ok) return;
+  state.invoices = data.invoices || [];
+  $('#invoices-count').textContent = state.invoices.length;
+  renderInvoices();
+  updateInvoiceStats();
+}
+
+// ============================================================
+//  داشبورد
+// ============================================================
+async function loadDashboard() {
+  const data = await api('/api/reports/summary');
+  if (!data.ok) return;
+  $('#dashboard-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-icon c1">🧾</div><div class="stat-value">${fmt(data.todayCount)}</div><div class="stat-label">فاکتور امروز</div></div>
+    <div class="stat-card"><div class="stat-icon c2">💰</div><div class="stat-value">${fmt(data.todaySales)}</div><div class="stat-label">فروش امروز (ت)</div></div>
+    <div class="stat-card"><div class="stat-icon c3">📈</div><div class="stat-value">${fmt(data.totalProfit)}</div><div class="stat-label">سود کل (ت)</div></div>
+    <div class="stat-card"><div class="stat-icon c4">📦</div><div class="stat-value">${fmt(data.totalProducts)}</div><div class="stat-label">کل کالاها</div></div>
+    <div class="stat-card"><div class="stat-icon c5">💎</div><div class="stat-value">${fmt(data.stockValue)}</div><div class="stat-label">ارزش انبار (ت)</div></div>
+    <div class="stat-card"><div class="stat-icon c6">⚠️</div><div class="stat-value">${fmt(data.lowStock)}</div><div class="stat-label">کم موجود</div></div>
+  `;
+  await loadSalesChart();
+  await loadWorkersChart();
+  await loadLowStock();
+}
+
+async function loadSalesChart() {
+  const data = await api('/api/reports/sales?days=30');
+  if (!data.ok) return;
+  const ctx = $('#chart-sales');
+  if (state.charts.sales) state.charts.sales.destroy();
+  state.charts.sales = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.sales.map(s => s.label),
+      datasets: [{
+        label: 'فروش',
+        data: data.sales.map(s => s.total),
+        borderColor: '#6366f1',
+        backgroundColor: 'rgba(99,102,241,0.15)',
+        fill: true, tension: 0.4, borderWidth: 3,
+        pointRadius: 4, pointBackgroundColor: '#6366f1',
+        pointBorderColor: 'white', pointBorderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: '#1e293b', padding: 12, cornerRadius: 10, titleFont: { family: 'Vazirmatn' }, bodyFont: { family: 'Vazirmatn' }, callbacks: { label: c => 'فروش: ' + fmt(c.parsed.y) + ' تومان' } }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: v => fmt(v), font: { family: 'Vazirmatn' } }, grid: { color: 'rgba(226,232,240,0.5)' } },
+        x: { ticks: { font: { family: 'Vazirmatn', size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+async function loadWorkersChart() {
+  const data = await api('/api/reports/workers');
+  if (!data.ok) return;
+  const ctx = $('#chart-workers');
+  if (state.charts.workers) state.charts.workers.destroy();
+  const colors = ['#6366f1', '#10b981', '#0891b2', '#f59e0b', '#ec4899', '#8b5cf6'];
+  state.charts.workers = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.stats.map(s => s.name),
+      datasets: [{ label: 'فروش', data: data.stats.map(s => s.total), backgroundColor: data.stats.map((_, i) => colors[i % colors.length]), borderRadius: 10 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: '#1e293b', padding: 12, cornerRadius: 10, titleFont: { family: 'Vazirmatn' }, bodyFont: { family: 'Vazirmatn' }, callbacks: { label: c => 'فروش: ' + fmt(c.parsed.y) + ' تومان' } }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: v => fmt(v), font: { family: 'Vazirmatn' } }, grid: { color: 'rgba(226,232,240,0.5)' } },
+        x: { ticks: { font: { family: 'Vazirmatn', size: 12 } }, grid: { display: false } }
+      }
+    }
+  });
+  $('#workers-stats-list').innerHTML = data.stats.map(s => `
+    <div class="worker-stat">
+      <div class="ws-name">👤 ${s.name}</div>
+      <div class="ws-nums">
+        <div class="ws-main">${fmt(s.total)} ت</div>
+        <div class="ws-sub">${fmt(s.count)} فاکتور · امروز: ${fmt(s.today)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function loadLowStock() {
+  const data = await api('/api/products/low-stock');
+  if (!data.ok) return;
+  $('#low-stock-badge').textContent = data.products.length;
+  const el = $('#low-stock-list');
+  if (!data.products.length) {
+    el.innerHTML = '<div class="empty-msg">✅ همه کالاها موجودی کافی دارند</div>';
+    return;
+  }
+  el.innerHTML = data.products.map(p => `
+    <div class="low-stock-item">
+      <div class="ls-info">
+        <div class="ls-name">${p.name}</div>
+        <div class="ls-barcode">${p.barcode || '—'}</div>
+      </div>
+      <div class="ls-stock">${fmt(p.stock)} ${p.unit || 'عدد'}</div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+//  محصولات
+// ============================================================
+function renderProducts() {
+  const q = ($('#search-products')?.value || '').trim().toLowerCase();
+  const filter = state.currentFilter;
+  const threshold = state.settings.lowStockThreshold || 3;
+  let list = [...state.products];
+  if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || String(p.barcode || '').includes(q));
+  if (filter === 'low') list = list.filter(p => Number(p.stock) <= threshold && Number(p.stock) > 0);
+  else if (filter === 'out') list = list.filter(p => Number(p.stock) === 0);
+  else if (filter === 'new') list = list.filter(p => p.createdAt && (Date.now() - new Date(p.createdAt).getTime()) < 7 * 86400000);
+  
+  const el = $('#products-list');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-msg">📭 کالایی یافت نشد</div>';
+    return;
+  }
+  el.innerHTML = list.map(p => {
+    const cat = state.categories.find(c => c.id === p.categoryId);
+    const brand = state.brands.find(b => b.id === p.brandId);
+    const qty = Number(p.stock) || 0;
+    const cls = qty === 0 ? 'danger' : qty <= threshold ? 'warn' : 'ok';
+    return `
+      <div class="product-card">
+        <div class="pc-icon" style="--cat-color:${cat?.color || '#6366f1'}">${cat?.icon || '📦'}</div>
+        <div class="pc-info">
+          <div class="pc-name">${p.name}</div>
+          <div class="pc-meta">
+            <span class="pc-barcode">${p.barcode || '—'}</span>
+            ${brand ? `<span class="pc-brand">${brand.icon || ''} ${brand.name}</span>` : ''}
+          </div>
+          <div class="pc-prices">
+            <span>خرید: ${fmt(p.costPrice)}</span>
+            <span>فروش: <b>${fmt(p.sellPrice)}</b></span>
+          </div>
+        </div>
+        <div class="pc-stock ${cls}">${fmt(qty)}<br><small>${p.unit || 'عدد'}</small></div>
+        <div class="pc-actions">
+          <button class="btn-icon" onclick="editProduct(${p.id})">✏️</button>
+          <button class="btn-icon danger" onclick="deleteProduct(${p.id})">🗑</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderCategoryOptions() {
+  const sel = $('#add-category');
+  sel.innerHTML = '<option value="">— انتخاب کنید —</option>' +
+    state.categories.map(c => `<option value="${c.id}">${c.icon || ''} ${c.name}</option>`).join('');
+}
+
+function renderBrandOptions() {
+  const sel = $('#add-brand');
+  sel.innerHTML = '<option value="">— انتخاب کنید —</option>' +
+    state.brands.map(b => `<option value="${b.id}">${b.icon || ''} ${b.name}</option>`).join('');
+}
+
+async function addProduct() {
+  const barcode = $('#add-barcode').value.trim();
+  const name = $('#add-name').value.trim();
+  const sell = Number($('#add-sell').value) || 0;
+  if (!name) return toast('نام کالا الزامی است', 'error');
+  if (sell <= 0) return toast('قیمت فروش الزامی است', 'error');
+  const res = await api('/api/products/add', {
+    method: 'POST',
+    body: {
+      barcode, name,
+      categoryId: Number($('#add-category').value) || null,
+      brandId: Number($('#add-brand').value) || null,
+      costPrice: Number($('#add-buy').value) || 0,
+      sellPrice: sell,
+      stock: Number($('#add-qty').value) || 0,
+      minStock: Number($('#add-min').value) || 3
+    }
+  });
+  if (res.ok) {
+    toast('✅ کالا ثبت شد', 'success');
+    $('#add-barcode').value = '';
+    $('#add-name').value = '';
+    $('#add-buy').value = '';
+    $('#add-sell').value = '';
+    $('#add-qty').value = '';
+    await loadProducts();
+  } else {
+    toast('خطا: ' + (res.error || ''), 'error');
+  }
+}
+
+window.editProduct = async (id) => {
+  const p = state.products.find(x => x.id === id);
+  if (!p) return;
+  const name = prompt('نام کالا:', p.name);
+  if (name === null) return;
+  const sell = prompt('قیمت فروش:', p.sellPrice);
+  if (sell === null) return;
+  const buy = prompt('قیمت خرید:', p.costPrice);
+  if (buy === null) return;
+  const stock = prompt('موجودی:', p.stock);
+  if (stock === null) return;
+  const res = await api('/api/products/update', {
+    method: 'POST',
+    body: { id, name, sellPrice: Number(sell), costPrice: Number(buy), stock: Number(stock) }
+  });
+  if (res.ok) { toast('✅ ویرایش شد', 'success'); loadProducts(); }
+};
+
+window.deleteProduct = async (id) => {
+  if (!confirm('این کالا حذف شود؟')) return;
+  const res = await api('/api/products/delete', { method: 'POST', body: { id } });
+  if (res.ok) { toast('🗑 حذف شد', 'success'); loadProducts(); }
+};
+
+// ============================================================
+//  اسکنر
+// ============================================================
+async function startScanner() {
+  if (state.isScanning) return;
+  const box = $('#scanner-container');
+  box.innerHTML = '<div id="reader" style="width:100%"></div>';
+  try {
+    state.scanner = new Html5Qrcode('reader');
+    await state.scanner.start(
+      { facingMode: 'environment' },
+      { fps: 15, qrbox: (w, h) => { const m = Math.min(w, h); return { width: Math.floor(m * 0.8), height: Math.floor(m * 0.6) }; }, aspectRatio: 1.3 },
+      (code) => { $('#add-barcode').value = code; beep(); toast('📷 ' + code, 'success'); stopScanner(); },
+      () => {}
+    );
+    state.isScanning = true;
+    $('#btn-start-scan').style.display = 'none';
+    $('#btn-stop-scan').style.display = 'block';
+  } catch (e) {
+    toast('خطا در دوربین: ' + e.message, 'error');
+    box.innerHTML = '<div class="scanner-placeholder">دوربین خاموش است</div>';
+  }
+}
+
+async function stopScanner() {
+  if (state.scanner && state.isScanning) {
+    try { await state.scanner.stop(); state.scanner.clear(); } catch {}
+    state.scanner = null;
+    state.isScanning = false;
+    $('#scanner-container').innerHTML = '<div class="scanner-placeholder">دوربین خاموش است</div>';
+    $('#btn-start-scan').style.display = 'block';
+    $('#btn-stop-scan').style.display = 'none';
+  }
+}
+
+function beep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = 1800;
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + 0.1);
+  } catch {}
+}
+
+// ============================================================
+//  فاکتورها
+// ============================================================
+function updateInvoiceStats() {
+  const today = new Date().toDateString();
+  const todayInv = state.invoices.filter(i => new Date(i.date).toDateString() === today);
+  const todaySum = todayInv.reduce((s, i) => s + i.finalPayable, 0);
+  const totalSum = state.invoices.reduce((s, i) => s + i.finalPayable, 0);
+  $('#invoice-stats').innerHTML = `
+    <div class="stat-card mini"><div class="stat-value blue">${fmt(state.invoices.length)}</div><div class="stat-label">کل فاکتورها</div></div>
+    <div class="stat-card mini"><div class="stat-value green">${fmt(todaySum)}</div><div class="stat-label">فروش امروز</div></div>
+    <div class="stat-card mini"><div class="stat-value orange">${fmt(totalSum)}</div><div class="stat-label">جمع فروش</div></div>
+  `;
+}
+
+function renderInvoices() {
+  const q = ($('#search-invoices')?.value || '').trim().toLowerCase();
+  const list = state.invoices.filter(inv => !q ||
+    inv.invoiceNumber.toLowerCase().includes(q) ||
+    (inv.customerName || '').toLowerCase().includes(q) ||
+    (inv.worker || '').toLowerCase().includes(q) ||
+    (inv.customerPhone || '').includes(q)
+  );
+  const el = $('#invoices-list');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-msg">📭 فاکتوری یافت نشد</div>';
+    return;
+  }
+  el.innerHTML = list.slice(0, 100).map(inv => {
+    const pClass = inv.paymentMethod === 'نقدی' ? 'cash' : inv.paymentMethod === 'کارتی' ? 'card' : 'credit';
+    const pIcon = inv.paymentMethod === 'نقدی' ? '💵' : inv.paymentMethod === 'کارتی' ? '💳' : '📝';
+    return `
+      <div class="invoice-card">
+        <div class="ic-head">
+          <div class="ic-num">🧾 ${inv.invoiceNumber}</div>
+          <div class="ic-total">${fmt(inv.finalPayable)} <small>ت</small></div>
+        </div>
+        <div class="ic-body">
+          <div class="ic-row"><span>👤 مشتری:</span><b>${inv.customerName || 'مشتری آزاد'}</b></div>
+          ${inv.customerPhone ? `<div class="ic-row"><span>📞 تلفن:</span><b dir="ltr">${inv.customerPhone}</b></div>` : ''}
+          <div class="ic-row"><span>👔 فروشنده:</span><b>${inv.worker}</b></div>
+          <div class="ic-row"><span>📅 تاریخ:</span><b>${fmtDate(inv.date)}</b></div>
+        </div>
+        <div class="ic-footer">
+          <div class="ic-tags">
+            <span class="tag worker-tag">👤 ${inv.worker}</span>
+            <span class="tag payment-tag ${pClass}">${pIcon} ${inv.paymentMethod}</span>
+            <span class="tag items-tag">📦 ${inv.items.length} قلم</span>
+            ${inv.discount > 0 ? `<span class="tag discount-tag">🎁 ${fmt(inv.discount)}</span>` : ''}
+          </div>
+          <div class="ic-actions">
+            <button class="btn-icon" onclick="viewInvoice('${inv.id}')" title="مشاهده">👁️</button>
+            <button class="btn-icon danger" onclick="deleteInvoice('${inv.id}')" title="حذف">🗑</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.deleteInvoice = async (id) => {
+  if (!confirm('این فاکتور حذف شود؟')) return;
+  const res = await api('/api/invoices/delete', { method: 'POST', body: { id } });
+  if (res.ok) { toast('🗑 حذف شد', 'success'); loadInvoices(); }
+};
+
+window.viewInvoice = (id) => {
+  const inv = state.invoices.find(i => i.id === id);
+  if (!inv) return;
+  state.viewedInvoice = inv;
+  showModal(`
+    <div class="invoice-view">
+      <div class="iv-header">
+        <h3>🧾 ${inv.invoiceNumber}</h3>
+        <div class="iv-total">${fmt(inv.finalPayable)} تومان</div>
+      </div>
+      <div class="iv-info">
+        <div><b>مشتری:</b> ${inv.customerName}</div>
+        <div><b>تلفن:</b> ${inv.customerPhone || '—'}</div>
+        <div><b>فروشنده:</b> ${inv.worker}</div>
+        <div><b>تاریخ:</b> ${fmtDateTime(inv.date)}</div>
+        <div><b>پرداخت:</b> ${inv.paymentMethod}</div>
+      </div>
+      <table class="iv-table">
+        <thead><tr><th>#</th><th>کالا</th><th>تعداد</th><th>قیمت</th><th>جمع</th></tr></thead>
+        <tbody>${inv.items.map((it, i) => `<tr><td>${i + 1}</td><td>${it.name}</td><td>${it.qty}</td><td>${fmt(it.sellPrice)}</td><td>${fmt(it.qty * it.sellPrice)}</td></tr>`).join('')}</tbody>
+      </table>
+      <div class="iv-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">بستن</button>
+        <button class="btn btn-info" onclick="printInv('a4')">🖨️ A4</button>
+        <button class="btn btn-info" onclick="printInv('thermal')">🧾 حرارتی</button>
+        <button class="btn btn-whatsapp" onclick="shareInv()">📱 واتساپ</button>
+      </div>
+    </div>
+  `);
+};
+
+window.printInv = (mode) => {
+  const inv = state.viewedInvoice;
+  if (!inv) return;
+  const win = window.open('', '_blank');
+  const base = window.location.origin;
+  if (mode === 'thermal') {
+    win.document.write(`
+      <html dir="rtl"><head><meta charset="UTF-8"><title>${inv.invoiceNumber}</title>
+      <link rel="stylesheet" href="${base}/style-invoice.css">
+      <style>@page{size:80mm auto;margin:2mm}body{margin:0;padding:0}</style>
+      </head><body>
+      <div class="invoice-thermal">
+        <div class="thermal-header"><div class="store-name">انباریار</div><h1>فاکتور فروش</h1><div class="subtitle">${inv.invoiceNumber}</div></div>
+        <div class="thermal-info">
+          <div class="row"><span>تاریخ:</span><span>${fmtDate(inv.date)}</span></div>
+          <div class="row"><span>فروشنده:</span><span>${inv.worker}</span></div>
+          <div class="row"><span>مشتری:</span><span>${inv.customerName}</span></div>
+        </div>
+        <table><thead><tr><th>کالا</th><th>تعداد</th><th>قیمت</th><th>جمع</th></tr></thead>
+        <tbody>${inv.items.map(it => `<tr><td>${it.name}</td><td>${it.qty}</td><td>${fmt(it.sellPrice)}</td><td>${fmt(it.qty * it.sellPrice)}</td></tr>`).join('')}</tbody></table>
+        <div class="thermal-summary">
+          <div class="row"><span>جمع:</span><span>${fmt(inv.subtotal)}</span></div>
+          ${inv.discount > 0 ? `<div class="row"><span>تخفیف:</span><span>-${fmt(inv.discount)}</span></div>` : ''}
+          <div class="row total"><span>نهایی:</span><span>${fmt(inv.finalPayable)}</span></div>
+          <div class="row"><span>پرداخت:</span><span>${inv.paymentMethod}</span></div>
+        </div>
+        <div class="thermal-footer"><div class="thanks">متشکریم 🌹</div><div>انباریار | آرین ✨</div></div>
+      </div>
+      </body></html>
+    `);
+  } else {
+    win.document.write(`
+      <html dir="rtl"><head><meta charset="UTF-8"><title>${inv.invoiceNumber}</title>
+      <link rel="stylesheet" href="${base}/style-invoice.css">
+      <style>@page{margin:15mm}body{margin:0;padding:0}</style>
+      </head><body>
+      <div class="invoice-a4">
+        <div class="header-invoice">
+          <h1>🧾 فاکتور فروش</h1>
+          <div class="subtitle">انباریار - مدیریت هوشمند فروشگاه</div>
+          <div class="invoice-number-badge">${inv.invoiceNumber}</div>
+        </div>
+        <div class="invoice-meta">
+          <div class="meta-row"><span class="meta-label">📅 تاریخ:</span><span class="meta-value">${fmtDate(inv.date)}</span></div>
+          <div class="meta-row"><span class="meta-label">⏰ ساعت:</span><span class="meta-value">${new Date(inv.date).toLocaleTimeString('fa-IR')}</span></div>
+          <div class="meta-row"><span class="meta-label">👔 فروشنده:</span><span class="meta-value">${inv.worker}</span></div>
+          <div class="meta-row"><span class="meta-label">👤 خریدار:</span><span class="meta-value">${inv.customerName}</span></div>
+          ${inv.customerPhone ? `<div class="meta-row"><span class="meta-label">📞 تلفن:</span><span class="meta-value" dir="ltr">${inv.customerPhone}</span></div>` : ''}
+          <div class="meta-row"><span class="meta-label">💳 پرداخت:</span><span class="meta-value">${inv.paymentMethod}</span></div>
+        </div>
+        <table>
+          <thead><tr><th class="col-num">#</th><th>شرح کالا</th><th class="col-qty">تعداد</th><th class="col-price">قیمت واحد</th><th class="col-total">مبلغ کل</th></tr></thead>
+          <tbody>${inv.items.map((it, i) => `<tr><td class="col-num">${i + 1}</td><td><span class="product-name">${it.name}</span></td><td class="col-qty">${it.qty}</td><td class="col-price">${fmt(it.sellPrice)}</td><td class="col-total">${fmt(it.qty * it.sellPrice)}</td></tr>`).join('')}</tbody>
+        </table>
+        <div class="summary">
+          <div class="summary-row"><span class="label">جمع کل:</span><span class="value">${fmt(inv.subtotal)} تومان</span></div>
+          ${inv.discount > 0 ? `<div class="summary-row discount"><span class="label">🎁 تخفیف:</span><span class="value">-${fmt(inv.discount)} تومان</span></div>` : ''}
+          <div class="summary-row total"><span class="label">مبلغ نهایی:</span><span class="value">${fmt(inv.finalPayable)} تومان</span></div>
+        </div>
+        <div class="words"><strong>💰 به حروف:</strong> ${numToWords(inv.finalPayable)}</div>
+        <div class="payment-info">
+          <div><strong>روش پرداخت:</strong> <span class="payment-badge">${inv.paymentMethod}</span></div>
+          <div><strong>تعداد اقلام:</strong> ${inv.items.length} قلم</div>
+        </div>
+        <div class="signatures">
+          <div class="signature-box"><div class="signature-line"></div><div class="sig-label">مهر و امضای فروشنده</div></div>
+          <div class="signature-box"><div class="signature-line"></div><div class="sig-label">امضای خریدار</div></div>
+        </div>
+        <div class="footer-invoice">
+          <div class="thanks">متشکریم از خرید شما</div>
+          <div>انباریار | ساخته شده با ❤️ توسط آرین ✨</div>
+        </div>
+      </div>
+      </body></html>
+    `);
+  }
+  win.document.close();
+  setTimeout(() => win.print(), 700);
+};
+
+window.shareInv = () => {
+  const inv = state.viewedInvoice;
+  if (!inv) return;
+  let text = `🧾 *فاکتور فروش*\nشماره: ${inv.invoiceNumber}\nتاریخ: ${fmtDate(inv.date)}\nمشتری: ${inv.customerName}\n\n📦 اقلام:\n`;
+  inv.items.forEach((it, i) => {
+    text += `${i + 1}. ${it.name} × ${it.qty} = ${fmt(it.qty * it.sellPrice)} تومان\n`;
+  });
+  text += `\n💰 نهایی: ${fmt(inv.finalPayable)} تومان\n💳 پرداخت: ${inv.paymentMethod}`;
+  let phone = (inv.customerPhone || '').replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/\D/g, '');
+  if (phone.startsWith('0')) phone = '98' + phone.slice(1);
+  else if (phone && !phone.startsWith('98')) phone = '98' + phone;
+  const url = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+};
+
+function numToWords(n) {
+  n = parseInt(n) || 0;
+  if (n === 0) return 'صفر تومان';
+  const yekan = ['', 'یک', 'دو', 'سه', 'چهار', 'پنج', 'شش', 'هفت', 'هشت', 'نه'];
+  const dahgan = ['', 'ده', 'بیست', 'سی', 'چهل', 'پنجاه', 'شصت', 'هفتاد', 'هشتاد', 'نود'];
+  const dahyek = ['ده', 'یازده', 'دوازده', 'سیزده', 'چهارده', 'پانزده', 'شانزده', 'هفده', 'هجده', 'نوزده'];
+  const sadgan = ['', 'یکصد', 'دویست', 'سیصد', 'چهارصد', 'پانصد', 'ششصد', 'هفتصد', 'هشتصد', 'نهصد'];
+  const tabaghat = ['', ' هزار', ' میلیون', ' میلیارد'];
+  function cp(num) {
+    let s = '', sad = Math.floor(num / 100), dah = Math.floor((num % 100) / 10), yek = num % 10;
+    if (sad > 0) s += sadgan[sad];
+    if (dah === 1) { if (s) s += ' و '; s += dahyek[yek]; }
+    else { if (dah > 0) { if (s) s += ' و '; s += dahgan[dah]; } if (yek > 0) { if (s) s += ' و '; s += yekan[yek]; } }
+    return s;
+  }
+  let parts = [], temp = n, level = 0;
+  while (temp > 0) { let chunk = temp % 1000; if (chunk > 0) parts.unshift(cp(chunk) + tabaghat[level]); temp = Math.floor(temp / 1000); level++; }
+  return parts.join(' و ') + ' تومان';
+}
+
+// ============================================================
+//  مودال عمومی
+// ============================================================
+function showModal(content) {
+  const m = document.createElement('div');
+  m.className = 'modal-backdrop';
+  m.innerHTML = `<div class="modal">${content}</div>`;
+  document.body.appendChild(m);
+  m.onclick = e => { if (e.target === m) closeModal(); };
+}
+
+function closeModal() {
+  const m = $('.modal-backdrop');
+  if (m) { m.style.opacity = '0'; setTimeout(() => m.remove(), 200); }
+}
+
+// ============================================================
+//  گزارش‌ها
+// ============================================================
+function renderWorkersReportFilter() {
+  const sel = $('#report-worker');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">همه کارگرا</option>' +
+    state.users.map(w => `<option value="${w.name}">${w.name}</option>`).join('');
+}
+
+async function loadDetailedReport() {
+  const days = Number($('#report-period')?.value || 30);
+  const workerFilter = $('#report-worker')?.value || '';
+  const cutoff = Date.now() - days * 24 * 3600 * 1000;
+  let filtered = state.invoices.filter(inv => new Date(inv.date).getTime() >= cutoff);
+  if (workerFilter) filtered = filtered.filter(inv => inv.worker === workerFilter);
+  
+  const total = filtered.reduce((s, inv) => s + inv.finalPayable, 0);
+  const count = filtered.length;
+  const avg = count ? Math.round(total / count) : 0;
+  const totalDiscount = filtered.reduce((s, inv) => s + (inv.discount || 0), 0);
+  let totalProfit = 0;
+  filtered.forEach(inv => {
+    inv.items.forEach(it => {
+      totalProfit += (it.sellPrice - (it.buyPrice || 0)) * it.qty;
+    });
+  });
+  
+  const productStats = {};
+  filtered.forEach(inv => {
+    inv.items.forEach(it => {
+      if (!productStats[it.name]) productStats[it.name] = { name: it.name, qty: 0, total: 0, count: 0 };
+      productStats[it.name].qty += it.qty;
+      productStats[it.name].total += it.qty * it.sellPrice;
+      productStats[it.name].count++;
+    });
+  });
+  const topProducts = Object.values(productStats).sort((a, b) => b.total - a.total).slice(0, 10);
+  
+  const dailyMap = {};
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    dailyMap[d.toISOString().slice(0, 10)] = { label: d.toLocaleDateString('fa-IR', { month: 'short', day: 'numeric' }), count: 0, total: 0 };
+  }
+  filtered.forEach(inv => {
+    const day = inv.date.slice(0, 10);
+    if (dailyMap[day]) { dailyMap[day].count++; dailyMap[day].total += inv.finalPayable; }
+  });
+  const daily = Object.values(dailyMap);
+  
+  $('#detailed-report').innerHTML = `
+    <div class="stats-grid compact">
+      <div class="stat-card mini"><div class="stat-value blue">${fmt(count)}</div><div class="stat-label">تعداد فاکتور</div></div>
+      <div class="stat-card mini"><div class="stat-value green">${fmt(total)}</div><div class="stat-label">جمع فروش</div></div>
+      <div class="stat-card mini"><div class="stat-value green">${fmt(totalProfit)}</div><div class="stat-label">سود تخمینی</div></div>
+      <div class="stat-card mini"><div class="stat-value orange">${fmt(avg)}</div><div class="stat-label">میانگین فاکتور</div></div>
+      <div class="stat-card mini"><div class="stat-value red">${fmt(totalDiscount)}</div><div class="stat-label">جمع تخفیف</div></div>
+    </div>
+    <div class="chart-wrap"><canvas id="chart-detailed"></canvas></div>
+  `;
+  
+  if (state.charts.detailed) state.charts.detailed.destroy();
+  const ctx = $('#chart-detailed');
+  if (ctx) {
+    state.charts.detailed = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: daily.map(d => d.label),
+        datasets: [{
+          label: 'فروش',
+          data: daily.map(d => d.total),
+          backgroundColor: 'rgba(99,102,241,0.7)',
+          borderColor: '#6366f1',
+          borderWidth: 1,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: '#1e293b', padding: 12, cornerRadius: 10, titleFont: { family: 'Vazirmatn' }, bodyFont: { family: 'Vazirmatn' }, callbacks: { label: c => 'فروش: ' + fmt(c.parsed.y) + ' تومان' } }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { callback: v => fmt(v), font: { family: 'Vazirmatn' } }, grid: { color: 'rgba(226,232,240,0.5)' } },
+          x: { ticks: { font: { family: 'Vazirmatn', size: 10 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+  
+  $('#top-products').innerHTML = topProducts.length ? topProducts.map((p, i) => `
+    <div class="top-product">
+      <div class="tp-rank">${i + 1}</div>
+      <div class="tp-info">
+        <div class="tp-name">${p.name}</div>
+        <div class="tp-meta">${fmt(p.qty)} عدد · ${fmt(p.count)} فاکتور</div>
+      </div>
+      <div class="tp-total">${fmt(p.total)} ت</div>
+    </div>
+  `).join('') : '<div class="empty-msg">داده‌ای نیست</div>';
+}
+
+async function loadPieChart() {
+  const stats = {};
+  state.invoices.forEach(inv => {
+    if (!stats[inv.worker]) stats[inv.worker] = 0;
+    stats[inv.worker] += inv.finalPayable;
+  });
+  const labels = Object.keys(stats);
+  const data = Object.values(stats);
+  if (!labels.length) return;
+  if (state.charts.pie) state.charts.pie.destroy();
+  const ctx = $('#chart-workers-pie');
+  if (!ctx) return;
+  const colors = ['#6366f1', '#10b981', '#0891b2', '#f59e0b', '#ec4899', '#8b5cf6'];
+  state.charts.pie = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors.slice(0, labels.length), borderWidth: 4, borderColor: 'white' }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: 'Vazirmatn', size: 12 }, padding: 16 } },
+        tooltip: { backgroundColor: '#1e293b', padding: 12, cornerRadius: 10, titleFont: { family: 'Vazirmatn' }, bodyFont: { family: 'Vazirmatn' }, callbacks: { label: c => c.label + ': ' + fmt(c.parsed) + ' تومان' } }
+      }
+    }
+  });
+}
+
+// ============================================================
+//  خروجی Excel
+// ============================================================
+function downloadFile(content, filename, mime = 'text/csv;charset=utf-8;') {
+  const BOM = '\uFEFF';
+  const blob = new Blob([BOM + content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function exportInvoicesCSV() {
+  if (!state.invoices.length) return toast('فاکتوری وجود ندارد', 'error');
+  const rows = [['شماره', 'تاریخ', 'فروشنده', 'مشتری', 'تلفن', 'پرداخت', 'جمع', 'تخفیف', 'نهایی', 'اقلام']];
+  state.invoices.forEach(inv => {
+    const items = inv.items.map(it => `${it.name}×${it.qty}`).join(' | ');
+    rows.push([inv.invoiceNumber, fmtDate(inv.date), inv.worker, inv.customerName, inv.customerPhone || '', inv.paymentMethod, inv.subtotal, inv.discount || 0, inv.finalPayable, items]);
+  });
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+  downloadFile(csv, `invoices-${new Date().toISOString().slice(0, 10)}.csv`);
+  toast('📥 خروجی گرفته شد', 'success');
+}
+
+function exportProductsCSV() {
+  if (!state.products.length) return toast('کالایی وجود ندارد', 'error');
+  const rows = [['بارکد', 'نام', 'دسته', 'برند', 'قیمت خرید', 'قیمت فروش', 'موجودی', 'واحد']];
+  state.products.forEach(p => {
+    const cat = state.categories.find(c => c.id === p.categoryId);
+    const brand = state.brands.find(b => b.id === p.brandId);
+    rows.push([p.barcode || '', p.name, cat?.name || '', brand?.name || '', p.costPrice, p.sellPrice, p.stock, p.unit || 'عدد']);
+  });
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+  downloadFile(csv, `products-${new Date().toISOString().slice(0, 10)}.csv`);
+  toast('📥 خروجی گرفته شد', 'success');
+}
+
+function exportJSON() {
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    signature: 'انباریار - ساخته شده با ❤️ توسط آرین',
+    products: state.products, invoices: state.invoices, users: state.users,
+    categories: state.categories, brands: state.brands, settings: state.settings
+  };
+  downloadFile(JSON.stringify(payload, null, 2), `anbariyar-backup-${new Date().toISOString().slice(0, 10)}.json`, 'application/json');
+  toast('💾 بکاپ دانلود شد', 'success');
+}
+
+// ============================================================
+//  کارگرا
+// ============================================================
+function renderWorkers() {
+  const el = $('#workers-list');
+  if (!state.users.length) { el.innerHTML = '<div class="empty-msg">کارگری ثبت نشده</div>'; return; }
+  el.innerHTML = state.users.map(w => `
+    <div class="worker-row">
+      <div class="wr-color" style="--wc:${w.color || '#6366f1'}">${w.role === 'manager' ? '👔' : '👤'}</div>
+      <div class="wr-info">
+        <div class="wr-name">${w.name}</div>
+        <div class="wr-status ${w.active ? 'active' : 'inactive'}">${w.active ? '✅ فعال' : '⛔ غیرفعال'}</div>
+      </div>
+      <div class="wr-actions">
+        <button class="btn btn-sm ${w.active ? 'btn-warning' : 'btn-success'}" onclick="toggleWorker('${w.id}')">${w.active ? 'غیرفعال' : 'فعال'}</button>
+        <button class="btn-icon danger" onclick="deleteWorker('${w.id}')">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function addWorker() {
+  const name = $('#new-worker-name').value.trim();
+  const role = $('#new-worker-role').value;
+  if (!name) return toast('نام الزامی است', 'error');
+  const res = await api('/api/users/add', { method: 'POST', body: { name, role } });
+  if (res.ok) {
+    toast('✅ اضافه شد', 'success');
+    $('#new-worker-name').value = '';
+    await loadUsers();
+    renderWorkersReportFilter();
+    generateQR();
+  } else {
+    toast('خطا: ' + (res.error || ''), 'error');
+  }
+}
+
+window.toggleWorker = async (id) => {
+  const res = await api('/api/users/toggle', { method: 'POST', body: { id } });
+  if (res.ok) { toast('✅ تغییر کرد', 'success'); loadUsers(); }
+};
+
+window.deleteWorker = async (id) => {
+  if (!confirm('این کارگر حذف شود؟')) return;
+  const res = await api('/api/users/delete', { method: 'POST', body: { id } });
+  if (res.ok) { toast('🗑 حذف شد', 'success'); loadUsers(); generateQR(); }
+};
+
+// ============================================================
+//  QR کد
+// ============================================================
+function generateQR() {
+  const url = window.location.origin + '/worker.html';
+  $('#qr-url').textContent = url;
+  const container = $('#qr-container');
+  container.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(url);
+  img.alt = 'QR Code';
+  container.appendChild(img);
+}
+
+function copyQRUrl() {
+  const url = window.location.origin + '/worker.html';
+  navigator.clipboard.writeText(url).then(() => toast('📋 کپی شد', 'success'));
+}
+
+// ============================================================
+//  تنظیمات
+// ============================================================
+async function saveSettings() {
+  const body = {
+    shopName: $('#set-shop-name').value.trim(),
+    shopPhone: $('#set-shop-phone').value.trim(),
+    shopAddress: $('#set-shop-address').value.trim(),
+    footerNote: $('#set-footer-note').value.trim(),
+    lowStockThreshold: Number($('#set-low-stock').value) || 3,
+    autoBackupHours: Number($('#set-backup-hours').value) || 6
+  };
+  const newPass = $('#set-admin-pass').value.trim();
+  if (newPass && newPass.length >= 4) body.adminPassword = newPass;
+  const res = await api('/api/settings', { method: 'POST', body });
+  if (res.ok) {
+    toast('✅ ذخیره شد', 'success');
+    if (newPass) { state.adminPass = newPass; localStorage.setItem('anbariyar_admin_pass', newPass); $('#set-admin-pass').value = ''; }
+    $('#shop-name-display').textContent = body.shopName || 'انباریار';
+    await loadSettings();
+  } else {
+    toast('خطا: ' + (res.error || ''), 'error');
+  }
+}
+
+async function manualBackup() {
+  const res = await api('/api/backup', { method: 'POST' });
+  if (res.ok) toast('💾 بکاپ گرفته شد', 'success');
+}
+
+// ============================================================
+//  مدیریت دسته‌بندی و برند
+// ============================================================
+function manageCategories() {
+  showModal(`
+    <h3>🗂️ مدیریت دسته‌بندی‌ها</h3>
+    <div class="modal-list">
+      ${state.categories.map(c => `
+        <div class="modal-list-item">
+          <div class="mli-icon" style="background:${c.color}20;color:${c.color}">${c.icon || '📦'}</div>
+          <div class="mli-name">${c.name}</div>
+          <button class="btn-icon danger" onclick="deleteCat(${c.id})">🗑</button>
+        </div>
+      `).join('') || '<div class="empty-msg">دسته‌ای وجود ندارد</div>'}
+    </div>
+    <h3 style="margin-top:16px">➕ افزودن دسته</h3>
+    <input type="text" id="new-cat-name" class="modal-input" placeholder="نام دسته">
+    <input type="text" id="new-cat-icon" class="modal-input" placeholder="آیکون (مثلاً 📦)" value="📦">
+    <button class="btn btn-primary btn-block" id="add-cat-btn">افزودن</button>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">بستن</button>
+    </div>
+  `);
+  $('#add-cat-btn').onclick = async () => {
+    const name = $('#new-cat-name').value.trim();
+    const icon = $('#new-cat-icon').value.trim() || '📦';
+    if (!name) return toast('نام الزامی است', 'error');
+    const res = await api('/api/categories/add', { method: 'POST', body: { name, icon } });
+    if (res.ok) { toast('✅ اضافه شد', 'success'); await loadConfig(); renderCategoryOptions(); manageCategories(); }
+  };
+}
+
+window.deleteCat = async (id) => {
+  if (!confirm('این دسته حذف شود؟')) return;
+  const res = await api('/api/categories/delete', { method: 'POST', body: { id } });
+  if (res.ok) { toast('🗑 حذف شد', 'success'); await loadConfig(); renderCategoryOptions(); manageCategories(); }
+};
+
+function manageBrands() {
+  showModal(`
+    <h3>🏷️ مدیریت برندها</h3>
+    <div class="modal-list">
+      ${state.brands.map(b => `
+        <div class="modal-list-item">
+          <div class="mli-icon">${b.icon || '🏷️'}</div>
+          <div class="mli-name">${b.name}</div>
+          <button class="btn-icon danger" onclick="deleteBrand(${b.id})">🗑</button>
+        </div>
+      `).join('') || '<div class="empty-msg">برندی وجود ندارد</div>'}
+    </div>
+    <h3 style="margin-top:16px">➕ افزودن برند</h3>
+    <input type="text" id="new-brand-name" class="modal-input" placeholder="نام برند">
+    <input type="text" id="new-brand-icon" class="modal-input" placeholder="آیکون" value="🏷️">
+    <button class="btn btn-primary btn-block" id="add-brand-btn">افزودن</button>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">بستن</button>
+    </div>
+  `);
+  $('#add-brand-btn').onclick = async () => {
+    const name = $('#new-brand-name').value.trim();
+    const icon = $('#new-brand-icon').value.trim() || '🏷️';
+    if (!name) return toast('نام الزامی است', 'error');
+    const res = await api('/api/brands/add', { method: 'POST', body: { name, icon } });
+    if (res.ok) { toast('✅ اضافه شد', 'success'); await loadConfig(); renderBrandOptions(); manageBrands(); }
+  };
+}
+
+window.deleteBrand = async (id) => {
+  if (!confirm('این برند حذف شود؟')) return;
+  const res = await api('/api/brands/delete', { method: 'POST', body: { id } });
+  if (res.ok) { toast('🗑 حذف شد', 'success'); await loadConfig(); renderBrandOptions(); manageBrands(); }
+};
+
+// ============================================================
+//  تم شب / روز
+// ============================================================
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('anbariyar_theme', next);
+  $('#theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙';
+  if (state.charts.sales) { state.charts.sales.destroy(); loadSalesChart(); }
+  if (state.charts.workers) { state.charts.workers.destroy(); loadWorkersChart(); }
+  if (state.charts.pie) { state.charts.pie.destroy(); loadPieChart(); }
+}
+
+// ============================================================
+//  راهنما
+// ============================================================
+function showHelp() {
+  showModal(`
+    <h3>📖 راهنمای پنل مدیر</h3>
+    <div class="help-content">
+      <p><b>📊 داشبورد</b><br>خلاصه فروش، نمودار ۳۰ روز اخیر، فروش هر کارگر، کالاهای کم موجود.</p>
+      <p><b>📦 محصولات</b><br>مدیریت کالاها با جستجو، فیلتر (کم موجود/ناموجود/جدید)، ویرایش و حذف.</p>
+      <p><b>➕ افزودن</b><br>ثبت کالای جدید با اسکن بارکد، انتخاب دسته و برند.</p>
+      <p><b>🧾 فاکتورها</b><br>مشاهده، چاپ (A4 و حرارتی)، واتساپ و حذف فاکتورها.</p>
+      <p><b>📈 گزارش‌ها</b><br>خروجی اکسل، گزارش تفصیلی با فیلتر بازه و کارگر، پرفروش‌ترین کالاها.</p>
+      <p><b>👥 کارگرا</b><br>افزودن، حذف، فعال/غیرفعال و دریافت QR کد صندوق.</p>
+      <p><b>⚙️ تنظیمات</b><br>اطلاعات فروشگاه، رمز عبور، مدیریت دسته‌بندی و برند، بکاپ.</p>
+      <hr style="margin:12px 0;border-color:var(--border)">
+      <p style="text-align:center;color:var(--text-3);font-size:11px">✨ انباریار نسخه ۳.۰<br>ساخته شده با ❤️ توسط آرین</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal()">فهمیدم ✅</button>
+    </div>
+  `);
+}
+
+// ============================================================
+//  شروع
+// ============================================================
+(async function init() {
+  const savedTheme = localStorage.getItem('anbariyar_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  const themeBtn = $('#theme-toggle');
+  if (themeBtn) themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+  $('#login-btn').onclick = doLogin;
+  $('#login-pass').onkeypress = e => { if (e.key === 'Enter') doLogin(); };
+  $('#login-pass').focus();
+
+  if (state.adminPass) {
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: state.adminPass })
+      });
+      const data = await res.json();
+      if (data.ok) { showPanel(); return; }
+      else { localStorage.removeItem('anbariyar_admin_pass'); state.adminPass = ''; }
+    } catch (e) {}
+  }
+})();
+</script>
+</body>
+</html>

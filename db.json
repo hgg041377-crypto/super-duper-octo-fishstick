@@ -1,0 +1,111 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "عمومی",
+      "icon": "📦",
+      "color": "#6366f1"
+    },
+    {
+      "id": 2,
+      "name": "خوراکی",
+      "icon": "🍎",
+      "color": "#10b981"
+    },
+    {
+      "id": 3,
+      "name": "نوشیدنی",
+      "icon": "🥤",
+      "color": "#0891b2"
+    },
+    {
+      "id": 4,
+      "name": "لبنیات",
+      "icon": "🥛",
+      "color": "#f59e0b"
+    }
+  ],
+  "brands": [
+    {
+      "id": 1,
+      "name": "متفرقه",
+      "icon": "🏷️"
+    },
+    {
+      "id": 2,
+      "name": "میهن",
+      "icon": "⭐"
+    },
+    {
+      "id": 3,
+      "name": "کاله",
+      "icon": "👑"
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "barcode": "6260931400834",
+      "name": "مانتانا",
+      "sku": "",
+      "unit": "عدد",
+      "categoryId": 1,
+      "brandId": 1,
+      "costPrice": 80000,
+      "sellPrice": 90000,
+      "stock": 9,
+      "minStock": 3,
+      "note": "",
+      "createdAt": "2026-09-10T22:06:54.852Z",
+      "createdBy": "admin"
+    }
+  ],
+  "purchases": [],
+  "sales": [
+    {
+      "id": 1,
+      "productId": 1,
+      "quantity": 1,
+      "sellPrice": 90000,
+      "total": 90000,
+      "customer": "o",
+      "date": "2026-09-10T22:50:41.887Z",
+      "invoiceNumber": "INV-1001",
+      "createdBy": "آقای کیانی"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "inv_1789080641887",
+      "invoiceNumber": "INV-1001",
+      "worker": "آقای کیانی",
+      "customerName": "o",
+      "customerPhone": "08",
+      "paymentMethod": "نقدی",
+      "items": [
+        {
+          "id": "it_1789080619190_9xh5",
+          "barcode": "6260931400834",
+          "name": "مانتانا",
+          "sellPrice": 90000,
+          "buyPrice": 80000,
+          "qty": 1,
+          "available": 10
+        }
+      ],
+      "subtotal": 90000,
+      "discount": 0,
+      "finalPayable": 90000,
+      "date": "2026-09-10T22:50:41.887Z",
+      "startedAt": "2026-09-10T22:21:38.498Z"
+    }
+  ],
+  "counters": {
+    "category": 4,
+    "brand": 3,
+    "product": 1,
+    "purchase": 0,
+    "sale": 1,
+    "invoice": 0
+  }
+}

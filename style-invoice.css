@@ -1,0 +1,357 @@
+/* ============================================================
+   style-invoice.css - فاکتورهای چاپی انباریار
+   ساخته شده با ❤️ توسط آرین
+   ============================================================ */
+
+.invoice-a4 {
+  font-family: Tahoma, Arial, sans-serif;
+  max-width: 760px;
+  margin: 20px auto;
+  padding: 0;
+  background: white;
+  color: #1e293b;
+  direction: rtl;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.invoice-a4 .header-invoice {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+  color: white;
+  padding: 28px 30px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.invoice-a4 .header-invoice h1 {
+  font-size: 26px;
+  color: white;
+  margin-bottom: 6px;
+  font-weight: 900;
+}
+
+.invoice-a4 .header-invoice .subtitle {
+  font-size: 13px;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 12px;
+}
+
+.invoice-a4 .header-invoice .invoice-number-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(8px);
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: bold;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.invoice-a4 .invoice-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  padding: 0;
+  background: white;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.invoice-a4 .invoice-meta .meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  font-size: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.invoice-a4 .invoice-meta .meta-row:nth-child(odd) { background: #f8fafc; }
+.invoice-a4 .invoice-meta .meta-label { color: #64748b; font-weight: bold; }
+.invoice-a4 .invoice-meta .meta-value { font-weight: bold; color: #1e293b; font-family: monospace; }
+
+.invoice-a4 table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  font-size: 12px;
+  background: white;
+}
+
+.invoice-a4 table thead {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+}
+
+.invoice-a4 table th {
+  padding: 14px 10px;
+  text-align: right;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.invoice-a4 table th.col-num { text-align: center; width: 40px; }
+.invoice-a4 table th.col-price,
+.invoice-a4 table th.col-total { text-align: left; }
+.invoice-a4 table th.col-qty { text-align: center; width: 60px; }
+
+.invoice-a4 table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.invoice-a4 table tbody tr:nth-child(even) { background: #f8fafc; }
+
+.invoice-a4 table td.col-num { text-align: center; font-family: monospace; color: #64748b; }
+.invoice-a4 table td.col-qty { text-align: center; font-weight: bold; color: #6366f1; }
+.invoice-a4 table td.col-price,
+.invoice-a4 table td.col-total { text-align: left; font-family: monospace; font-weight: bold; }
+.invoice-a4 table td.col-total { color: #059669; }
+.invoice-a4 table .product-name { font-weight: bold; color: #1e293b; }
+.invoice-a4 table .product-barcode {
+  font-size: 10px;
+  color: #94a3b8;
+  font-family: monospace;
+  display: block;
+  margin-top: 2px;
+  direction: ltr;
+  text-align: right;
+}
+
+.invoice-a4 .summary {
+  margin: 20px 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.invoice-a4 .summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+.invoice-a4 .summary-row .label { color: #64748b; font-weight: bold; }
+.invoice-a4 .summary-row .value { font-family: monospace; font-weight: bold; color: #1e293b; }
+.invoice-a4 .summary-row.discount .label,
+.invoice-a4 .summary-row.discount .value { color: #dc2626; }
+
+.invoice-a4 .summary-row.total {
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 2px dashed #6366f1;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.invoice-a4 .summary-row.total .label { color: #1e293b; font-size: 15px; }
+.invoice-a4 .summary-row.total .value {
+  color: #059669;
+  font-size: 22px;
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  padding: 6px 16px;
+  border-radius: 10px;
+}
+
+.invoice-a4 .words {
+  margin: 0 30px 20px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  border-radius: 12px;
+  font-size: 12px;
+  color: #4338ca;
+  line-height: 1.8;
+  border-right: 4px solid #6366f1;
+}
+
+.invoice-a4 .words strong { color: #1e293b; }
+
+.invoice-a4 .payment-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 30px 20px;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 12px;
+  border: 2px dashed #cbd5e1;
+  font-size: 12px;
+}
+
+.invoice-a4 .payment-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.invoice-a4 .signatures {
+  display: flex;
+  justify-content: space-around;
+  margin: 30px;
+  padding-top: 20px;
+  font-size: 12px;
+  gap: 20px;
+}
+
+.invoice-a4 .signature-box { text-align: center; flex: 1; max-width: 200px; }
+.invoice-a4 .signature-line { border-top: 2px dashed #94a3b8; margin-bottom: 8px; padding-top: 50px; }
+.invoice-a4 .signature-box .sig-label { color: #64748b; font-weight: bold; font-size: 11px; }
+
+.invoice-a4 .footer-invoice {
+  margin-top: 20px;
+  padding: 20px 30px;
+  text-align: center;
+  font-size: 11px;
+  color: #94a3b8;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-top: 2px solid #e2e8f0;
+}
+
+.invoice-a4 .footer-invoice .thanks {
+  font-size: 16px;
+  color: #6366f1;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+/* ==================== Thermal Invoice ==================== */
+.invoice-thermal {
+  font-family: 'Courier New', monospace;
+  width: 76mm;
+  margin: 0 auto;
+  padding: 8px;
+  background: white;
+  color: #000;
+  direction: rtl;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.invoice-thermal .thermal-header {
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 2px dashed #000;
+  margin-bottom: 10px;
+}
+
+.invoice-thermal .thermal-header .store-name {
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+
+.invoice-thermal .thermal-header h1 { font-size: 13px; font-weight: bold; margin-bottom: 4px; }
+.invoice-thermal .thermal-header .subtitle { font-size: 10px; letter-spacing: 1px; }
+
+.invoice-thermal .thermal-info {
+  font-size: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #000;
+}
+
+.invoice-thermal .thermal-info .row { display: flex; justify-content: space-between; padding: 2px 0; }
+.invoice-thermal .thermal-info .row .label { font-weight: bold; }
+
+.invoice-thermal table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0;
+  font-size: 10px;
+}
+
+.invoice-thermal table th {
+  border-bottom: 1px solid #000;
+  border-top: 1px solid #000;
+  padding: 4px 2px;
+  text-align: right;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.invoice-thermal table td { padding: 4px 2px; border-bottom: 1px dotted #999; font-size: 10px; }
+
+.invoice-thermal .thermal-summary {
+  border-top: 2px dashed #000;
+  padding-top: 8px;
+  margin-top: 8px;
+}
+
+.invoice-thermal .thermal-summary .row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 11px; }
+
+.invoice-thermal .thermal-summary .row.total {
+  font-size: 14px;
+  font-weight: bold;
+  border-top: 2px solid #000;
+  border-bottom: 2px solid #000;
+  padding: 8px 0;
+  margin-top: 6px;
+}
+
+.invoice-thermal .barcode-display {
+  text-align: center;
+  margin: 12px 0;
+  font-family: monospace;
+  font-size: 14px;
+  letter-spacing: 4px;
+  padding: 6px 0;
+  border-top: 1px dashed #000;
+  border-bottom: 1px dashed #000;
+}
+
+.invoice-thermal .thermal-footer {
+  text-align: center;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 2px dashed #000;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.invoice-thermal .thermal-footer .thanks { font-size: 12px; font-weight: bold; margin-bottom: 4px; }
+
+/* ==================== Print ==================== */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { background: white !important; margin: 0; padding: 0; }
+  .invoice-a4, .invoice-thermal { box-shadow: none !important; border: none !important; margin: 0 !important; border-radius: 0 !important; }
+  .no-print { display: none !important; }
+}
+
+@media print and (min-width: 100mm) {
+  @page { size: A4; margin: 12mm; }
+  .invoice-a4 { max-width: 100%; padding: 0; }
+}
+
+@media print and (max-width: 100mm) {
+  @page { size: 80mm auto; margin: 2mm; }
+  .invoice-thermal { width: 76mm; padding: 2px; }
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 600px) {
+  .invoice-a4 { margin: 10px; border-radius: 8px; }
+  .invoice-a4 .header-invoice { padding: 20px 16px; }
+  .invoice-a4 .header-invoice h1 { font-size: 20px; }
+  .invoice-a4 .invoice-meta { grid-template-columns: 1fr; }
+  .invoice-a4 table { font-size: 10px; }
+  .invoice-a4 table th, .invoice-a4 table td { padding: 8px 6px; }
+  .invoice-a4 .summary { margin: 16px; padding: 14px; }
+  .invoice-a4 .summary-row.total { font-size: 14px; }
+  .invoice-a4 .summary-row.total .value { font-size: 16px; padding: 4px 10px; }
+  .invoice-a4 .words { margin: 0 16px 16px; padding: 10px 12px; font-size: 11px; }
+  .invoice-a4 .payment-info { margin: 0 16px 16px; padding: 12px; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .invoice-a4 .signatures { margin: 20px 16px; flex-direction: column; gap: 30px; }
+  .invoice-a4 .signature-box { max-width: 100%; }
+}

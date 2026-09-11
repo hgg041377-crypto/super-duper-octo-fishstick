@@ -1,0 +1,30 @@
+[
+  {
+    "id": "u1",
+    "name": "آقای کیانی",
+    "role": "manager",
+    "active": true,
+    "color": "#6366f1"
+  },
+  {
+    "id": "u2",
+    "name": "بابک",
+    "role": "worker",
+    "active": true,
+    "color": "#10b981"
+  },
+  {
+    "id": "u3",
+    "name": "سیامک",
+    "role": "worker",
+    "active": true,
+    "color": "#0891b2"
+  },
+  {
+    "id": "u4",
+    "name": "مصطفی",
+    "role": "worker",
+    "active": true,
+    "color": "#f59e0b"
+  }
+]
